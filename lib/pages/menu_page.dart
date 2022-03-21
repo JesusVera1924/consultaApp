@@ -59,10 +59,10 @@ class _MenuLateralState extends State<MenuLateral> {
           DrawerHeader(
               margin: EdgeInsets.zero,
               padding: EdgeInsets.zero,
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: AssetImage('lib/image/menu.jpg'))),
+              decoration: BoxDecoration(
+                  color: UtilView.convertColor(UtilView.empresa.cl3Emp)
+                  //UtilView.convertColor(UtilView.empresa.cl2Emp)
+                  ),
               child: Stack(children: <Widget>[
                 Positioned(
                     bottom: 12.0,
