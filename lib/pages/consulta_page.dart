@@ -1,10 +1,14 @@
 import 'package:another_flushbar/flushbar.dart';
-import 'package:app_consulta/class/cobranza.dart';
+import 'package:app_consulta/class/cuenta_user.dart';
 import 'package:app_consulta/class/factura.dart';
+import 'package:app_consulta/provider/cuenta_cxc_provider.dart';
 import 'package:app_consulta/services/solicitud_api.dart';
+import 'package:app_consulta/style/custom_inputs.dart';
+import 'package:app_consulta/utils/date_formatter.dart';
 import 'package:app_consulta/widget/util_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConsultaPage extends StatelessWidget {
@@ -12,7 +16,7 @@ class ConsultaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: MyHome());
+    return const MyHome();
   }
 }
 
@@ -28,78 +32,27 @@ class _MyHomeState extends State<MyHome> {
   List<FacturaCabecera> listFact = []; //tabla de todo los usuarios facturados
   List<FacturaDet> listFactDet = []; //  tabla del detalle de la factura
   List<FacturaDet> listFactDet1 = []; //tabla de el filtro de CODREF Y NUMREF
-  List<Cobranza> listClientes = []; //listado de clientes del combo
+  List<CuentaUsuario> listClientes = []; //listado de clientes del combo
   List<CuentasPorCobrar> listCxc = [];
   List<CuentasPorCobrar> listCxcFiltro = [];
 
   //controladores
   final myController = TextEditingController();
-  final myFechaStart = TextEditingController();
-  final myFechaEnd = TextEditingController();
 
   //instancias
   SolicitudApi myConexion = SolicitudApi();
-  DateTime dateActual = DateTime.now();
-  DateTime currentDate = DateTime.now();
-  DateTime currentDateHast = DateTime.now();
   //variables de presentacion
-  var selectCliente;
+
   String finalValorEmp = "";
+  String codigoUsuario = "";
   double totalCartera = 0.0;
   String empresa = "";
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: dateActual,
-      helpText: 'Seleccionar Fecha',
-      firstDate: DateTime(2019),
-      lastDate: dateActual,
-      fieldLabelText: 'Ingresar Fecha',
-      fieldHintText: 'Dia-Mes-Año',
-    );
-
-    if (pickedDate != null && pickedDate != currentDate) {
-      setState(() {
-        currentDate = pickedDate;
-        myFechaStart.text = DateFormat("dd-MM-yyyy")
-            .format(DateTime.parse(currentDate.toString()));
-      });
-    }
-  }
-
-  Future<void> _selectDateAfter(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: dateActual,
-      helpText: 'Seleccionar Fecha',
-      firstDate: DateTime(2019),
-      lastDate: dateActual,
-      fieldLabelText: 'Ingresar Fecha',
-      fieldHintText: 'Dia-Mes-Año',
-    );
-
-    if (pickedDate != null && pickedDate != currentDateHast) {
-      setState(() {
-        currentDateHast = pickedDate;
-        myFechaEnd.text = DateFormat("dd-MM-yyyy")
-            .format(DateTime.parse(currentDateHast.toString()));
-      });
-    }
-  }
-
-  bool rangoFech(DateTime dateDesd, DateTime dateHast) {
-    if (dateHast.isAfter(dateDesd)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   void loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     finalValorEmp = prefs.getString('codEmp')!;
-    var x = await myConexion.consultaClientes(finalValorEmp);
+    codigoUsuario = prefs.getString('codusr')!;
+    var x = await myConexion.consultaClientescxc(finalValorEmp, codigoUsuario);
     if (x.isNotEmpty) {
       setState(() {
         listClientes = x;
@@ -107,41 +60,48 @@ class _MyHomeState extends State<MyHome> {
     }
   }
 
-  void getList(var val, fechdes, fechas) async {
+  Future getList(var val, fechdes, fechas) async {
     var x = await myConexion.consultaFacturaCabFech(
-        finalValorEmp, 'FC', val, selectCliente, fechdes, fechas);
+        finalValorEmp,
+        val,
+        Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente,
+        fechdes,
+        fechas);
     setState(() {
       listFact = x;
     });
   }
 
   void getListDet(var val) async {
-    var xp = await myConexion.consultaFacturaDet(
-        finalValorEmp, 'FC', val, selectCliente);
+    var xp = await myConexion.consultaFacturaDet(finalValorEmp, 'FC', val,
+        Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente);
     setState(() {
       listFactDet = xp;
     });
   }
 
-  void getListSolofecha(fechdes, fechas) async {
+  Future getListSolofecha(fechdes, fechas) async {
     var x = await myConexion.consultaFacturaCabSolo(
-        finalValorEmp, selectCliente, 'FC', fechdes, fechas);
+        finalValorEmp,
+        Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente,
+        fechdes,
+        fechas);
     setState(() {
       listFact = x;
     });
   }
 
   void getListDetail(x, y) async {
-    var result =
-        await myConexion.consultaFacturaDet(finalValorEmp, x, y, selectCliente);
+    var result = await myConexion.consultaFacturaDet(finalValorEmp, x, y,
+        Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente);
     setState(() {
       listFactDet1 = result;
     });
   }
 
   void getListCxC() async {
-    var result =
-        await myConexion.consultaCuentasxCobrar(finalValorEmp, selectCliente);
+    var result = await myConexion.consultaCuentasxCobrar(finalValorEmp,
+        Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente);
     setState(() {
       listCxc = result;
     });
@@ -150,11 +110,11 @@ class _MyHomeState extends State<MyHome> {
   Future<List<CuentasPorCobrar>> getListFuturo() async {
     List<CuentasPorCobrar> result = [];
     try {
-      result =
-          await myConexion.consultaCuentasxCobrar(finalValorEmp, selectCliente);
+      result = await myConexion.consultaCuentasxCobrar(finalValorEmp,
+          Provider.of<CuentaCxcProvider>(context, listen: false).selectCliente);
       total(result);
     } catch (e) {
-      print(e.toString());
+      rethrow;
     }
 
     return result;
@@ -176,105 +136,103 @@ class _MyHomeState extends State<MyHome> {
   @override
   void dispose() {
     myController.dispose();
-    myFechaEnd.dispose();
-    myFechaStart.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    myFechaEnd.text =
-        DateFormat("dd-MM-yyyy").format(DateTime.parse(dateActual.toString()));
-    myFechaStart.text = DateFormat("dd-MM-yyyy")
-        .format(dateActual.add(const Duration(days: -365)));
-    loadData(); 
+    loadData();
     super.initState();
   }
 
-  dataBody(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: DataTable(
-            headingRowColor: MaterialStateProperty.resolveWith<Color>(
-                (Set<MaterialState> states) {
-              return Theme.of(context).colorScheme.secondary;
-            }),
-            showCheckboxColumn: false,
-            columnSpacing: 30,
-            columns: const [
-              DataColumn(
-                label: Expanded(
-                  child: Text(
-                    'Tipo',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                numeric: false,
-                tooltip: "Escribir descripcion...",
-              ),
-              DataColumn(
+  @override
+  Widget build(BuildContext context) {
+    final providerCuenta = Provider.of<CuentaCxcProvider>(context);
+
+    dataBody() {
+      return Expanded(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: DataTable(
+              headingRowColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                return Theme.of(context).colorScheme.secondary;
+              }),
+              showCheckboxColumn: false,
+              columnSpacing: 30,
+              columns: const [
+                DataColumn(
                   label: Expanded(
                     child: Text(
-                      'Numero',
+                      'Tipo',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                   numeric: false,
-                  tooltip: "Escribir descripcion..."),
-              DataColumn(
-                  label: Expanded(
+                  tooltip: "Escribir descripcion...",
+                ),
+                DataColumn(
+                    label: Expanded(
                       child: Text(
-                    'Fecha',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-                  numeric: false,
-                  tooltip: "Escribir descripcion..."),
-              DataColumn(
-                  label: Expanded(
-                      child: Text(
-                    'Recibo',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  )),
-                  numeric: false,
-                  tooltip: "Escribir descripcion..."),
-              DataColumn(
-                  label: Expanded(
-                      child: Text(
-                    'Valor',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  )),
-                  numeric: false,
-                  tooltip: "Escribir descripcion..."),
-              DataColumn(
-                  label: Expanded(
-                      child: Text(
-                    'Saldo',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  )),
-                  numeric: false,
-                  tooltip: "Escribir descripcion..."),
-            ],
-            rows: listFact
-                .map((fact) => DataRow(
-                      onSelectChanged: (value) async {
-                        if (fact.valMov != fact.sdoMov) {
-                          getListDet(fact.numMov);
-                          setState(() {
+                        'Numero',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    numeric: false,
+                    tooltip: "Escribir descripcion..."),
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                      'Fecha',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    )),
+                    numeric: false,
+                    tooltip: "Escribir descripcion..."),
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                      'Recibo',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    )),
+                    numeric: false,
+                    tooltip: "Escribir descripcion..."),
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                      'Valor',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    )),
+                    numeric: false,
+                    tooltip: "Escribir descripcion..."),
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                      'Saldo',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    )),
+                    numeric: false,
+                    tooltip: "Escribir descripcion..."),
+              ],
+              rows: listFact
+                  .map((fact) => DataRow(
+                        onSelectChanged: (value) async {
+                          if (fact.valMov != fact.sdoMov) {
+                            await providerCuenta.getListDet(
+                                fact.numMov, finalValorEmp);
+
                             showDialog(
-                                barrierDismissible: true,
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
@@ -333,8 +291,18 @@ class _MyHomeState extends State<MyHome> {
                                                       numeric: false,
                                                       tooltip:
                                                           "Escribir descripcion..."),
+                                                  DataColumn(
+                                                      label: Expanded(
+                                                          child: Text(
+                                                        'F.emision',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      )),
+                                                      numeric: false,
+                                                      tooltip:
+                                                          "Escribir descripcion..."),
                                                 ],
-                                                rows: listFactDet
+                                                rows: providerCuenta.listFactDet
                                                     .map((det) => DataRow(
                                                             onSelectChanged:
                                                                 (value) async {
@@ -438,7 +406,7 @@ class _MyHomeState extends State<MyHome> {
                                                                                               DataCell(
                                                                                                 Align(
                                                                                                   alignment: Alignment.centerRight,
-                                                                                                  child: Text("${detail.valMov.toStringAsFixed(2)}"),
+                                                                                                  child: Text(detail.valMov.toStringAsFixed(2)),
                                                                                                 ),
                                                                                               ),
                                                                                               DataCell(
@@ -488,6 +456,15 @@ class _MyHomeState extends State<MyHome> {
                                                                           2)),
                                                                 ),
                                                               ),
+                                                              DataCell(
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerRight,
+                                                                  child: Text(det
+                                                                      .fecEmi),
+                                                                ),
+                                                              ),
                                                             ]))
                                                     .toList()),
                                           )
@@ -496,83 +473,74 @@ class _MyHomeState extends State<MyHome> {
                                     )),
                                   );
                                 });
-                          });
-                        }
-                      },
-                      cells: [
-                        DataCell(
-                          Text(fact.codMov),
-                        ),
-                        DataCell(
-                          Text(fact.numMov),
-                        ),
-                        DataCell(
-                          Text((DateFormat("dd-MM-yyyy")
-                              .format(DateTime.parse(fact.fecEmi.toString())))),
-                        ),
-                        DataCell(
-                          Text(fact.numRel),
-                        ),
-                        DataCell(
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(fact.valMov.toStringAsFixed(2))),
-                        ),
-                        DataCell(
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                fact.sdoMov.toStringAsFixed(2),
-                              )),
-                        ),
-                      ],
-                    ))
-                .toList()),
-      ),
-    );
-  }
+                          }
+                        },
+                        cells: [
+                          DataCell(
+                            Text(fact.codMov),
+                          ),
+                          DataCell(
+                            Text(fact.numMov),
+                          ),
+                          DataCell(
+                            Text((DateFormat("dd-MM-yyyy").format(
+                                DateTime.parse(fact.fecEmi.toString())))),
+                          ),
+                          DataCell(
+                            Text(fact.numRel),
+                          ),
+                          DataCell(
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(fact.valMov.toStringAsFixed(2))),
+                          ),
+                          DataCell(
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  fact.sdoMov.toStringAsFixed(2),
+                                )),
+                          ),
+                        ],
+                      ))
+                  .toList()),
+        ),
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    void selectDate(String cadena) async {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+      );
+      if (picked != null) {
+        setState(() {
+          switch (cadena) {
+            case 'init':
+              providerCuenta.txtCritFI.text =
+                  UtilView.dateFormatDMY(picked.toString());
+              break;
+            case 'finish':
+              providerCuenta.txtCritFF.text =
+                  UtilView.dateFormatDMY(picked.toString());
+              break;
+            default:
+          }
+        });
+      }
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Consulta'),
           backgroundColor: UtilView.convertColor(UtilView.empresa.cl2Emp),
         ),
-        /* 
-        resizeToAvoidBottomPadding: false, */
         body: Padding(
           padding: const EdgeInsets.fromLTRB(29.0, 45.0, 29.0, 10.0),
           child: Column(
             children: [
-              SizedBox(
-                height: 35.0,
-                child: listClientes.isNotEmpty
-                    ? DropdownButton<String>(
-                        isExpanded: true,
-                        underline: Container(
-                          height: 2,
-                          color: Colors.black,
-                        ),
-                        hint: const Text("Seleccione una Opcion "),
-                        value: selectCliente,
-                        isDense: true,
-                        onChanged: (value) {
-                          setState(() {
-                            selectCliente = value;
-                            listFact = [];
-                          });
-                          print(selectCliente);
-                        },
-                        items: listClientes.map((Cobranza map) {
-                          return DropdownMenuItem<String>(
-                            value: map.codRef,
-                            child: Text(map.codRef + " - " + map.nomRef,
-                                style: TextStyle(color: Colors.black)),
-                          );
-                        }).toList())
-                    : const Text('Cargando lista de clientes........'),
-              ),
               const SizedBox(
                 height: 11.0,
               ),
@@ -587,12 +555,12 @@ class _MyHomeState extends State<MyHome> {
                     child: TextFormField(
                       controller: myController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        hintText: 'Numero',
-                      ),
+                      decoration: CustomInputs.boxInputDecorationSimple(
+                          hint: 'Numero', label: 'Numero'),
                     ),
                   ),
                   Container(
+                    margin: const EdgeInsets.only(left: 35),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -604,7 +572,7 @@ class _MyHomeState extends State<MyHome> {
                               spreadRadius: 2),
                           BoxShadow(
                               color: Colors.grey.shade300,
-                              offset: Offset(1, 2),
+                              offset: const Offset(1, 2),
                               blurRadius: 5,
                               spreadRadius: 1)
                         ]),
@@ -613,19 +581,26 @@ class _MyHomeState extends State<MyHome> {
                       tooltip: "Busqueda de las Facturas de los clientes ",
                       highlightColor: Colors.amberAccent,
                       splashColor: Colors.grey[350],
-                      onPressed: () {
+                      onPressed: () async {
                         //metodo para la vista y control de fechas
                         if (myController.text != "" &&
-                            myFechaStart.text != "" &&
-                            myFechaEnd.text != "") {
-                          if (rangoFech(currentDate, currentDateHast)) {
+                            providerCuenta.txtCritFI.text != "" &&
+                            providerCuenta.txtCritFF.text != "") {
+                          if (providerCuenta.rangoFech()) {
                             //metodo
-                            getList(myController.text, myFechaStart.text,
-                                myFechaEnd.text);
+                            await getList(
+                                myController.text,
+                                providerCuenta.txtCritFI.text,
+                                providerCuenta.txtCritFF.text);
+
+                            if (listFact.isEmpty) {
+                              UtilView.messageWarning('Sin registros', context);
+                            }
+
                             myController.text = "";
                           } else {
                             Flushbar(
-                              margin: EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
                               title: "Info",
                               message:
                                   "Fecha de Hasta: es menor a la Fecha Desde",
@@ -638,9 +613,14 @@ class _MyHomeState extends State<MyHome> {
                             ).show(context);
                           }
                         } else if (myController.text == "" &&
-                            myFechaStart.text != "" &&
-                            myFechaEnd.text != "") {
-                          getListSolofecha(myFechaStart.text, myFechaEnd.text);
+                            providerCuenta.txtCritFI.text != "" &&
+                            providerCuenta.txtCritFF.text != "") {
+                          await getListSolofecha(providerCuenta.txtCritFI.text,
+                              providerCuenta.txtCritFF.text);
+
+                          if (listFact.isEmpty) {
+                            UtilView.messageWarning('Sin registros', context);
+                          }
                         } else {
                           Flushbar(
                             margin: const EdgeInsets.all(8),
@@ -652,7 +632,7 @@ class _MyHomeState extends State<MyHome> {
                               size: 28.0,
                               color: Colors.blue[400],
                             ),
-                            duration: Duration(seconds: 3),
+                            duration: const Duration(seconds: 3),
                           ).show(context);
                         }
                       },
@@ -661,7 +641,7 @@ class _MyHomeState extends State<MyHome> {
                   const SizedBox(
                     width: 10.0,
                   ),
-                  RaisedButton(
+                  MaterialButton(
                     color: Colors.white,
                     onPressed: () async {
                       showDialog(
@@ -750,8 +730,10 @@ class _MyHomeState extends State<MyHome> {
                                                             Align(
                                                               alignment: Alignment
                                                                   .centerRight,
-                                                              child: Text(
-                                                                  "${e.total.toStringAsFixed(2)}"),
+                                                              child: Text(e
+                                                                  .total
+                                                                  .toStringAsFixed(
+                                                                      2)),
                                                             ),
                                                           ),
                                                         ]))
@@ -759,7 +741,7 @@ class _MyHomeState extends State<MyHome> {
                                               ),
                                             ),
                                             Container(
-                                              decoration: BoxDecoration(
+                                              decoration: const BoxDecoration(
                                                 border: Border.symmetric(
                                                     horizontal: BorderSide(
                                                         color: Colors.grey)),
@@ -767,10 +749,10 @@ class _MyHomeState extends State<MyHome> {
                                               ),
                                               child: Row(
                                                 children: [
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     width: 24.0,
                                                   ),
-                                                  Expanded(
+                                                  const Expanded(
                                                       flex: 2,
                                                       child: Text("Total:  ")),
                                                   Padding(
@@ -780,14 +762,12 @@ class _MyHomeState extends State<MyHome> {
                                                             top: 12,
                                                             right: 24,
                                                             left: 12),
-                                                    child: Container(
-                                                      child: Text(
-                                                        '${totalCartera.toStringAsFixed(2)}',
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                        ),
+                                                    child: Text(
+                                                      totalCartera
+                                                          .toStringAsFixed(2),
+                                                      textAlign: TextAlign.left,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
                                                       ),
                                                     ),
                                                   ),
@@ -797,17 +777,15 @@ class _MyHomeState extends State<MyHome> {
                                           ],
                                         );
                                       } else {
-                                        return Container(
-                                          child: Center(
-                                            child: Column(
-                                              children: [
-                                                CircularProgressIndicator(
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation(
-                                                          Colors.blue),
-                                                ),
-                                              ],
-                                            ),
+                                        return Center(
+                                          child: Column(
+                                            children: const [
+                                              CircularProgressIndicator(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation(
+                                                        Colors.blue),
+                                              ),
+                                            ],
                                           ),
                                         );
                                       }
@@ -820,12 +798,12 @@ class _MyHomeState extends State<MyHome> {
                         },
                       );
                     },
-                    child: Text('CXC'),
+                    child: const Text('CXC'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10.0,
                   ),
-                  RaisedButton(
+                  MaterialButton(
                     onPressed: () {
                       showDialog(
                           context: context,
@@ -835,7 +813,7 @@ class _MyHomeState extends State<MyHome> {
                               shape: const RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20.0))),
-                              content: Container(
+                              content: SizedBox(
                                   height: 600,
                                   child: FutureBuilder<List<CuentasPorCobrar>>(
                                     future: getListFuturo(),
@@ -857,12 +835,12 @@ class _MyHomeState extends State<MyHome> {
                                                     fontSize: 20),
                                               ),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 5.0,
                                             ),
                                             SingleChildScrollView(
-                                              padding:
-                                                  EdgeInsets.only(top: 10.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0),
                                               scrollDirection: Axis.horizontal,
                                               child: DataTable(
                                                 headingRowColor:
@@ -877,7 +855,7 @@ class _MyHomeState extends State<MyHome> {
                                                 horizontalMargin: 10,
                                                 showCheckboxColumn: false,
                                                 columnSpacing: 15.0,
-                                                columns: [
+                                                columns: const [
                                                   DataColumn(
                                                       label: Expanded(
                                                           child: Text(
@@ -988,49 +966,61 @@ class _MyHomeState extends State<MyHome> {
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.f130Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .f130Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                           DataCell(
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.f3060Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .f3060Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                           DataCell(
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.f6090Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .f6090Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                           DataCell(
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.f90120Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .f90120Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                           DataCell(
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.f120150Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .f120150Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                           DataCell(
                                                             Align(
                                                                 alignment: Alignment
                                                                     .centerRight,
-                                                                child: Text(
-                                                                    "${e.fMas150Dias.toStringAsFixed(2)}")),
+                                                                child: Text(e
+                                                                    .fMas150Dias
+                                                                    .toStringAsFixed(
+                                                                        2))),
                                                           ),
                                                         ]))
                                                     .toList(),
                                               ),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 5.0,
                                             ),
                                             Padding(
@@ -1045,12 +1035,12 @@ class _MyHomeState extends State<MyHome> {
                                                     fontSize: 20),
                                               ),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 5.0,
                                             ),
                                             SingleChildScrollView(
-                                              padding:
-                                                  EdgeInsets.only(top: 10.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0),
                                               scrollDirection: Axis.horizontal,
                                               child: DataTable(
                                                 headingRowColor:
@@ -1247,7 +1237,7 @@ class _MyHomeState extends State<MyHome> {
                           });
                     },
                     color: Colors.white,
-                    child: Text('CxC.Edad'),
+                    child: const Text('CxC.Edad'),
                   ),
                   const SizedBox(
                     width: 5.0,
@@ -1260,38 +1250,37 @@ class _MyHomeState extends State<MyHome> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                        flex: 2,
-                        child: TextField(
-                          controller: myFechaStart,
-                          onTap: () {
-                            _selectDate(context);
-                          },
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                              hintText: 'Desde:',
-                              prefixIcon: Icon(Icons.date_range),
-                              suffixIcon: Icon(Icons.arrow_drop_down)),
-                        )),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: TextFormField(
+                          controller: providerCuenta.txtCritFI,
+                          decoration: CustomInputs.boxInputDecorationDatePicker(
+                              labelText: 'Inicio',
+                              fc: () => selectDate('init')),
+                          inputFormatters: [DateFormatter()],
+                          onChanged: (value) {},
+                        ),
+                      ),
+                    ),
                     const SizedBox(
                       width: 25,
                     ),
                     Expanded(
-                        flex: 2,
-                        child: TextField(
-                            readOnly: true,
-                            controller: myFechaEnd,
-                            onTap: () {
-                              _selectDateAfter(context);
-                            },
-                            decoration: const InputDecoration(
-                                hintText: 'Hasta:',
-                                prefixIcon: Icon(Icons.date_range),
-                                suffixIcon: Icon(Icons.arrow_drop_down))))
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: TextFormField(
+                          controller: providerCuenta.txtCritFF,
+                          decoration: CustomInputs.boxInputDecorationDatePicker(
+                              labelText: 'Fin', fc: () => selectDate('finish')),
+                          inputFormatters: [DateFormatter()],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               listFact.isNotEmpty
-                  ? dataBody(context)
+                  ? dataBody()
                   : const SizedBox(
                       height: 150,
                       child: Center(

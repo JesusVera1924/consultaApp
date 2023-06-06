@@ -1,8 +1,9 @@
 import 'package:app_consulta/class/guia.dart';
+import 'package:app_consulta/provider/guia_provider.dart';
 import 'package:flutter/material.dart';
 
-Future<bool> dialogProperty(
-    BuildContext context, Guia guia, String estado) async {
+Future<bool> dialogProperty(BuildContext context, Guia guia, String estado,
+    GuiaProvider provider) async {
   bool op = false;
   //var f = NumberFormat('###0.00', 'en_US');
   await showDialog(
@@ -58,6 +59,51 @@ Future<bool> dialogProperty(
                         Expanded(
                             child: Text(
                           guia.destino,
+                          textAlign: TextAlign.end,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ))
+                      ],
+                    ),
+                    const Divider(thickness: 1),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Expanded(child: Text('ASIGNACION:')),
+                        Expanded(
+                            child: Text(
+                          provider.numero,
+                          textAlign: TextAlign.end,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ))
+                      ],
+                    ),
+                    const Divider(thickness: 1),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Expanded(child: Text('SUPERVISOR:')),
+                        Expanded(
+                            child: Text(
+                          guia.uckGdr,
+                          textAlign: TextAlign.end,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ))
+                      ],
+                    ),
+                    const Divider(thickness: 1),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Expanded(child: Text('EMPACADOR:')),
+                        Expanded(
+                            child: Text(
+                          guia.uckGdr,
                           textAlign: TextAlign.end,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,

@@ -3,6 +3,7 @@ import 'package:app_consulta/style/custom_inputs.dart';
 import 'package:app_consulta/utils/date_formatter.dart';
 import 'package:app_consulta/widget/util_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class GuiaPage extends StatelessWidget {
@@ -12,7 +13,7 @@ class GuiaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Consulta de cuentas'),
+        title: const Text('Consulta de guias'),
         backgroundColor: UtilView.convertColor(UtilView.empresa.cl2Emp),
       ),
       backgroundColor: UtilView.convertColor("#abb8c3"),
@@ -74,25 +75,24 @@ class _BodyPageState extends State<BodyPage> {
               key: formKey,
               child: Card(
                   elevation: 4,
+                  /* color: Colors.white, */
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
                       Radius.circular(25),
                     ),
                   ),
                   child: Container(
-                    width: UtilView.codUser.startsWith("V9")
-                        ? 400
-                        : size.width / 2,
-                    height: size.height / 3,
+                    width: size.width * 70 / 100,
                     color: Colors.white,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text(
                             'Criterio de filtro de usuarios',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
+                                fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                         ),
                         Padding(
@@ -109,6 +109,7 @@ class _BodyPageState extends State<BodyPage> {
                               if (value!.isEmpty) {
                                 return "Campo requerido";
                               }
+                              return null;
                             },
                           ),
                         ),
@@ -127,6 +128,7 @@ class _BodyPageState extends State<BodyPage> {
                               if (value!.isEmpty) {
                                 return "Campo requerido";
                               }
+                              return null;
                             },
                           ),
                         ),
@@ -134,21 +136,30 @@ class _BodyPageState extends State<BodyPage> {
                             ? Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 5),
-                                child: Row(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text(
-                                      'FILTAR VENDEDOR',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Switch(
-                                      value: isSwitched,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isSwitched = value;
-                                        });
-                                      },
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          'FILTAR VENDEDOR',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Switch(
+                                          value: isSwitched,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isSwitched = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
                                     ),
                                     isSwitched
                                         ? SizedBox(
@@ -160,9 +171,13 @@ class _BodyPageState extends State<BodyPage> {
                                               textCapitalization:
                                                   TextCapitalization.characters,
                                               decoration: CustomInputs
-                                                  .boxInputDecorationicon(
+                                                  .boxInputDecorationSimple(
                                                       hint: 'Busqueda',
                                                       label: 'Busqueda'),
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(
+                                                    4)
+                                              ],
                                               validator: (value) {
                                                 if (value!.length < 4) {
                                                   return "CODIGO INVALIDO";
@@ -210,15 +225,18 @@ class _BodyPageState extends State<BodyPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
+                      width: MediaQuery.of(context).size.width * 60 / 100,
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
                           controller: provider.controllerC,
                           keyboardType: TextInputType.text,
                           decoration:
-                              CustomInputs.boxInputDecorationDialogSearch(
-                                  hint: 'Busqueda..', label: 'Codigo/Nombre'),
+                              CustomInputs.boxInputDecorationFunctionClear(
+                                  hintText: 'Busqueda..',
+                                  fc: () {
+                                    provider.controllerC.clear();
+                                  }),
                           onEditingComplete: () {
                             provider.onSearchTextChanged(
                                 provider.controllerC.text.toUpperCase());
@@ -243,28 +261,6 @@ class _BodyPageState extends State<BodyPage> {
                         splashColor: Colors.grey[350],
                         onPressed: () => provider.onSearchTextChanged(
                             provider.controllerC.text.toUpperCase()),
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 2.5,
-                        ),
-                      ),
-                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: IconButton(
-                        icon: const Icon(Icons.cleaning_services_rounded),
-                        tooltip: "NUEVA BUSQUEDA",
-                        highlightColor: const Color.fromARGB(255, 84, 230, 222),
-                        splashColor: Colors.grey[350],
-                        onPressed: () {
-                          setState(() {
-                            provider.limpiar();
-                          });
-                        },
                       ),
                     ),
                   ],
@@ -308,6 +304,11 @@ class _BodyPageState extends State<BodyPage> {
 
                                 provider.codRef =
                                     provider.listUsuario[index].codRef;
+
+                                provider.txtFechaInicio.text =
+                                    provider.txtInicioUser.text;
+                                provider.txtFechaFin.text =
+                                    provider.txtFinUser.text;
 
                                 UtilView.userSeleccionado =
                                     provider.listUsuario[index].codRef;

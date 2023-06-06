@@ -1,5 +1,4 @@
 import 'package:app_consulta/provider/cuenta_provider.dart';
-import 'package:app_consulta/services/solicitud_api.dart';
 import 'package:app_consulta/style/custom_inputs.dart';
 import 'package:app_consulta/widget/util_view.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +37,6 @@ class _BodyUsuarioPageState extends State<BodyUsuarioPage> {
 
   @override
   Widget build(BuildContext context) {
-    final solicitudApi = SolicitudApi();
     final provider = Provider.of<CuentaProvider>(context);
     return Column(
       children: [
@@ -48,16 +46,17 @@ class _BodyUsuarioPageState extends State<BodyUsuarioPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
+                width: MediaQuery.of(context).size.width * 60 / 100,
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     controller: provider.controllerC,
                     keyboardType: TextInputType.text,
-                    decoration: CustomInputs.boxInputDecorationGrey(
-                        hint: 'CODIGO',
-                        label: 'CODIGO',
-                        icon: Icons.assignment),
+                    decoration: CustomInputs.boxInputDecorationFunctionClear(
+                        hintText: 'CODIGO',
+                        fc: () {
+                          provider.controllerC.clear();
+                        }),
                     onEditingComplete: () {
                       provider.onSearchTextChanged(
                           provider.controllerC.text.toUpperCase());

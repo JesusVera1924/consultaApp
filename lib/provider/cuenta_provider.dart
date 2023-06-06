@@ -33,6 +33,8 @@ class CuentaProvider extends ChangeNotifier {
   }
 
   void findQueryClient(String emp, String codigo) async {
+    listUsuario.clear();
+    listUsuarioTemp.clear();
     listUsuario = await solicitudApi.findClientVen(emp, codigo);
     listUsuarioTemp.addAll(listUsuario);
     notifyListeners();
@@ -52,7 +54,9 @@ class CuentaProvider extends ChangeNotifier {
 
     for (var userDetail in listUsuarioTemp) {
       if (userDetail.cliente.contains(text) ||
-          userDetail.ncliente.contains(text)) listUsuario.add(userDetail);
+          userDetail.ncliente.contains(text)) {
+        listUsuario.add(userDetail);
+      }
     }
 
     notifyListeners();

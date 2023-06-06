@@ -2,12 +2,16 @@ import 'package:app_consulta/class/cc0020.dart';
 import 'package:app_consulta/class/client_ven.dart';
 import 'package:app_consulta/class/cliente.dart';
 import 'package:app_consulta/class/cobranza.dart';
+import 'package:app_consulta/class/cuenta_user.dart';
 import 'package:app_consulta/class/empresa.dart';
 import 'package:app_consulta/class/factura.dart';
 import 'package:app_consulta/class/guia.dart';
+import 'package:app_consulta/class/ig0040y.dart';
+import 'package:app_consulta/class/karmov.dart';
 import 'package:app_consulta/class/users.dart';
 import 'package:app_consulta/class/usremp.dart';
 import 'package:app_consulta/class/usuario_response.dart';
+import 'package:app_consulta/widget/util_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -17,6 +21,7 @@ class SolicitudApi {
     Empresa dato;
     var url = Uri.parse(
         "https://www.cojapan.com.ec/solicitud/getempresa?empresa=$emp");
+    print(url.toString());
 
     try {
       http.Response respuesta = await http.get(url);
@@ -39,6 +44,8 @@ class SolicitudApi {
   Future<List<User>> getLogin(String user, String pass) async {
     var url = Uri.https('www.cojapan.com.ec', '/contabilidad/loginMovil',
         {'usuario': user, 'pass': pass});
+
+    print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -59,10 +66,30 @@ class SolicitudApi {
   Future<List<Cobranza>> consultaClientes(String emp) async {
     var url = Uri.http('www.cojapan.com.ec:8088',
         '/wscojapan/rest/service_cobranza/clientescob', {'codemp': emp});
+
+    print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
         return parseClientes(utf8.decode(respuesta.bodyBytes));
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+  }
+
+  Future<List<CuentaUsuario>> consultaClientescxc(
+      String empresa, vendedor) async {
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getusercxc',
+        {'empresa': empresa, 'vendedor': vendedor});
+
+    print(url.toString());
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        return parseClientescxc(utf8.decode(respuesta.bodyBytes));
       } else {
         throw Exception('Excepcion ' + respuesta.statusCode.toString());
       }
@@ -76,12 +103,20 @@ class SolicitudApi {
     return parseo.map<Cobranza>((json) => Cobranza.fromJson(json)).toList();
   }
 
-  Future<List<FacturaCabecera>> consultaFacturaCab(
+  List<CuentaUsuario> parseClientescxc(String respuesta) {
+    final parseo = jsonDecode(respuesta);
+    return parseo
+        .map<CuentaUsuario>((json) => CuentaUsuario.fromMap(json))
+        .toList();
+  }
+
+/*   Future<List<FacturaCabecera>> consultaFacturaCab(
       String emp, String tipo, String nummov, String codref) async {
     var url = Uri.http(
         'www.cojapan.com.ec:8088',
         '/wscojapan/rest/service_cobranza/cobroscab',
         {'codemp': emp, 'codref': codref, 'codmov': tipo, 'nummov': nummov});
+    print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -93,20 +128,20 @@ class SolicitudApi {
       throw ('error el en GET: $e');
     }
   }
-
+ */
   List<FacturaCabecera> parseFacturaCab(String respuesta) {
     final parseo = jsonDecode(respuesta);
     return parseo
-        .map<FacturaCabecera>((json) => FacturaCabecera.fromJson(json))
+        .map<FacturaCabecera>((json) => FacturaCabecera.fromMap(json))
         .toList();
   }
 
   Future<List<FacturaDet>> consultaFacturaDet(
       String emp, String tipo, String nummov, String codref) async {
-    var url = Uri.http(
-        'www.cojapan.com.ec:8088',
-        '/wscojapan/rest/service_cobranza/cobrosdet',
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobrosdeb',
         {'codemp': emp, 'codref': codref, 'codmov': tipo, 'nummov': nummov});
+
+    print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -125,16 +160,17 @@ class SolicitudApi {
   }
 
   Future<List<FacturaCabecera>> consultaFacturaCabFech(String emp, String tipo,
-      String nummov, String codref, String fecdes, String fechas) async {
-    var url = Uri.http('www.cojapan.com.ec:8088',
-        '/wscojapan/rest/service_cobranza/cobroscab', {
+      String codref, String fecdes, String fechas) async {
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobroscab', {
       'codemp': emp,
       'codref': codref,
       'codmov': tipo,
-      'nummov': nummov,
-      'fecdes': fecdes,
-      'fechas': fechas
+      'inicio': UtilView.dateFormatYMD(fecdes),
+      'fin': UtilView.dateFormatYMD(fechas)
     });
+
+    print(url.toString());
+
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -147,17 +183,18 @@ class SolicitudApi {
     }
   }
 
-  Future<List<FacturaCabecera>> consultaFacturaCabSolo(String emp,
-      String codref, String tipo, String fecdes, String fechas) async {
-    var url = Uri.http('www.cojapan.com.ec:8088',
-        '/wscojapan/rest/service_cobranza/cobroscab', {
+  Future<List<FacturaCabecera>> consultaFacturaCabSolo(
+      String emp, String codref, String fecdes, String fechas) async {
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobroscab', {
       'codemp': emp,
       'codref': codref,
-      'codmov': tipo,
-      'nummov': '',
-      'fecdes': fecdes,
-      'fechas': fechas
+      'codmov': '',
+      'inicio': UtilView.dateFormatYMD(fecdes),
+      'fin': UtilView.dateFormatYMD(fechas)
     });
+
+    print(url.toString());
+
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -178,6 +215,7 @@ class SolicitudApi {
         {'codemp': emp, 'codref': codref});
 
     print(url.toString());
+
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -224,13 +262,14 @@ class SolicitudApi {
   Future<List<UsrEmp>> consultaUserEmp(String grupo, String codusr) async {
     var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getEmpUser',
         {'grupo': grupo, 'codusr': codusr});
+    print(url.toString());
 
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
         return parseUsuariosEmp(utf8.decode(respuesta.bodyBytes));
       } else {
-        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+        throw Exception('Excepcion' + respuesta.statusCode.toString());
       }
     } catch (e) {
       throw ('error el en GET: $e');
@@ -246,6 +285,8 @@ class SolicitudApi {
     dynamic resul;
     var url = Uri.https('www.cojapan.com.ec', '/solicitud/getcliente',
         {'empresa': empresa, 'codigo': usuario});
+
+    print(url.toString());
 
     try {
       http.Response respuesta = await http.get(url);
@@ -265,15 +306,15 @@ class SolicitudApi {
 
   Future<List<ClienteVen>> findClientVen(String empresa, String ven) async {
     List<ClienteVen> resul = [];
-    var url = Uri.http(
-        'www.cojapan.com.ec:8088',
-        '/wscojapan/rest/service_cobranza/vldclientes',
-        {'codemp': empresa, 'codven': ven, 'select': 'A'});
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/vldClientes',
+        {'codemp': empresa, 'codven': ven});
     print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
-        resul = parseClient(utf8.decode(respuesta.bodyBytes));
+        resul = respuesta.body == ""
+            ? []
+            : parseClient(utf8.decode(respuesta.bodyBytes));
       } else {
         throw Exception('Excepcion ' + respuesta.statusCode.toString());
       }
@@ -293,7 +334,7 @@ class SolicitudApi {
     List<Guia> resul = [];
     var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getguias',
         {'usuario': usuario, 'inicio': inicio, 'fin': fin});
-
+    print(url.toString());
     try {
       http.Response respuesta = await http.get(url);
       if (respuesta.statusCode == 200) {
@@ -348,7 +389,7 @@ class SolicitudApi {
       'empresa': empresa,
       'inicio': inicio,
       'fin': fin,
-      'vendedor': vendcode.startsWith("V9") ? "" : vendcode
+      'vendedor': vendcode
     });
     print(url.toString());
     try {
@@ -374,5 +415,55 @@ class SolicitudApi {
         .map<UsuarioResponse>((json) => UsuarioResponse.fromMap(json))
         .toList();
   }
+
+  Future<List<Karmov>> getKarmov(String empresa, String movimiento) async {
+    List<Karmov> resul = [];
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getMovKarmov',
+        {'codemp': empresa, 'nummov': movimiento});
+
+    print(url.toString());
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        if (respuesta.body != "") {
+          return respuesta.body.toString() != "[]"
+              ? parseKarmovResponse(utf8.decode(respuesta.bodyBytes))
+              : resul;
+        }
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+    return resul;
+  }
+
+  List<Karmov> parseKarmovResponse(String respuesta) {
+    final parseo = jsonDecode(respuesta);
+    return parseo.map<Karmov>((json) => Karmov.fromMap(json)).toList();
+  }
+
+  Future<Ig0040Y?> getFacturaIg0040y(String numero) async {
+    Ig0040Y? resul;
+    var url = Uri.https(
+        'www.cojapan.com.ec', '/contabilidad/getFactura', {'tipo': numero});
+
+    print(url.toString());
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        if (respuesta.body != "") {
+          resul = Ig0040Y.fromJson(utf8.decode(respuesta.bodyBytes));
+        }
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+    return resul;
+  }
+
   //https://www.cojapan.com.ec/contabilidad/getUsuarioGuia?empresa=01&vendedor=V009
 }

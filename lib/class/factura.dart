@@ -1,104 +1,73 @@
+import 'dart:convert';
+
 class FacturaCabecera {
-  String codBco;
-  String codCob;
-  String codDiv;
-  String codEmp;
-  String codMov;
-  String codNex;
-  String codPto;
+  FacturaCabecera({
+    required this.codRef,
+    required this.codMov,
+    required this.numMov,
+    required this.numRel,
+    required this.valMov,
+    required this.fecEmi,
+    required this.codCob,
+    required this.nomRef,
+    required this.cedRuc,
+    required this.dirRef,
+    required this.telRef,
+    required this.codAux,
+    required this.sdoMov,
+  });
+
   String codRef;
-  String codRel;
-  double cotDiv;
-  String fcrNex;
-  String fecEmi;
-  String fecNex;
-  String fecVen;
-  String girador;
-  String idnBir;
-  String ncrNex;
-  String nomRef;
-  String numCta;
+  String codMov;
   String numMov;
-  String numNex;
   String numRel;
-  String nunCta;
-  String obsMov;
-  String ptoNex;
-  String ptoRel;
-  String scsMov;
-  double sdoMov;
-  String sosMov;
-  String stsMov;
   double valMov;
+  DateTime fecEmi;
+  String codCob;
+  String nomRef;
+  String cedRuc;
+  String dirRef;
+  String telRef;
+  String codAux;
+  double sdoMov;
 
-  FacturaCabecera(
-      {required this.codBco,
-      required this.codCob,
-      required this.codDiv,
-      required this.codEmp,
-      required this.codMov,
-      required this.codNex,
-      required this.codPto,
-      required this.codRef,
-      required this.codRel,
-      required this.cotDiv,
-      required this.fcrNex,
-      required this.fecEmi,
-      required this.fecNex,
-      required this.fecVen,
-      required this.girador,
-      required this.idnBir,
-      required this.ncrNex,
-      required this.nomRef,
-      required this.numCta,
-      required this.numMov,
-      required this.numNex,
-      required this.numRel,
-      required this.nunCta,
-      required this.obsMov,
-      required this.ptoNex,
-      required this.ptoRel,
-      required this.scsMov,
-      required this.sdoMov,
-      required this.sosMov,
-      required this.stsMov,
-      required this.valMov});
+  factory FacturaCabecera.fromJson(String str) =>
+      FacturaCabecera.fromMap(json.decode(str));
 
-  factory FacturaCabecera.fromJson(Map<String, dynamic> json) {
-    return FacturaCabecera(
-      codBco: json['cod_bco'],
-      codCob: json['cod_cob'],
-      codDiv: json['cod_div'],
-      codEmp: json['cod_emp'],
-      codMov: json['cod_mov'],
-      codNex: json['cod_nex'],
-      codPto: json['cod_pto'],
-      codRef: json['cod_ref'],
-      codRel: json['cod_rel'],
-      cotDiv: json['cot_div'],
-      fcrNex: json['fcr_nex'],
-      fecEmi: json['fec_emi'],
-      fecNex: json['fec_nex'],
-      fecVen: json['fec_ven'],
-      girador: json['girador'],
-      idnBir: json['idn_bir'],
-      ncrNex: json['ncr_nex'],
-      nomRef: json['nom_ref'],
-      numCta: json['num_cta'],
-      numMov: json['num_mov'],
-      numNex: json['num_nex'],
-      numRel: json['num_rel'],
-      nunCta: json['nun_cta'],
-      obsMov: json['obs_mov'],
-      ptoNex: json['pto_nex'],
-      ptoRel: json['pto_rel'],
-      scsMov: json['scs_mov'],
-      sdoMov: json['sdo_mov'],
-      sosMov: json['sos_mov'],
-      stsMov: json['sts_mov'],
-      valMov: json['val_mov'],
-    );
-  }
+  String toJson() => json.encode(toMap());
+
+  factory FacturaCabecera.fromMap(Map<String, dynamic> json) => FacturaCabecera(
+        codRef: json["cod_ref"],
+        codMov: json["cod_mov"],
+        numMov: json["num_mov"],
+        numRel: json["num_rel"],
+        valMov: json["val_mov"].toDouble(),
+        fecEmi: DateTime.parse(json["fec_emi"]),
+        codCob: json["cod_cob"],
+        nomRef: json["nom_ref"],
+        cedRuc: json["ced_ruc"],
+        dirRef: json["dir_ref"],
+        telRef: json["tel_Ref"],
+        codAux: json["cod_aux"],
+        sdoMov: json["sdo_mov"].toDouble(),
+      );
+
+  Map<String, dynamic> toMap() => {
+        "cod_ref": codRef,
+        "cod_mov": codMov,
+        "num_mov": numMov,
+        "num_rel": numRel,
+        "val_mov": valMov,
+        "fec_emi":
+            "${fecEmi.year.toString().padLeft(4, '0')}-${fecEmi.month.toString().padLeft(2, '0')}-${fecEmi.day.toString().padLeft(2, '0')}",
+        "cod_cob": codCob,
+        "nom_ref": nomRef,
+        "ced_ruc": cedRuc,
+        "dir_ref": dirRef,
+        "tel_Ref": telRef,
+        "cod_aux": codAux,
+        "sdo_mov": sdoMov,
+      };
 }
 
 class FacturaDet {

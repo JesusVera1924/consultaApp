@@ -1,17 +1,17 @@
 import 'package:app_consulta/class/guia.dart';
-import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 
 class GuiaDataSource extends DataGridSource {
-  GuiaDataSource(this.list, this.context) {
+  GuiaDataSource(this.list, this.context, this.tamano) {
     buildDataGridRows();
   }
 
   List<DataGridRow> _dataGridRows = <DataGridRow>[];
 
   final List<Guia> list;
-  final BuildContext context; 
+  final BuildContext context;
+  final double tamano;
 
   /// Building DataGridRows
   void buildDataGridRows() {
@@ -36,41 +36,62 @@ class GuiaDataSource extends DataGridSource {
       Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         alignment: Alignment.center,
-        child: Text(
-          row.getCells()[0].value.toString(),
-          overflow: TextOverflow.ellipsis,
+        child: Tooltip(
+          message: row.getCells()[0].value.toString(),
+          child: Text(
+            row.getCells()[0].value.toString(),
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: tamano),
+          ),
         ),
       ),
       Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.center,
-        child: Text(
-          row.getCells()[1].value.toString(),
-          overflow: TextOverflow.ellipsis,
+        child: Tooltip(
+          message: row.getCells()[1].value.toString(),
+          child: Text(
+            row.getCells()[1].value.toString(),
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: tamano),
+          ),
         ),
       ),
       Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.centerRight,
-        child: Text(
-          row.getCells()[2].value.toString(),
-          overflow: TextOverflow.ellipsis,
+        child: Tooltip(
+          message: row.getCells()[2].value.toString(),
+          child: Text(
+            row.getCells()[2].value.toString(),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            style: TextStyle(fontSize: tamano),
+          ),
         ),
       ),
       Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
         alignment: Alignment.center,
-        child: Text(
-          row.getCells()[3].value.toString(),
-          overflow: TextOverflow.ellipsis,
+        child: Tooltip(
+          message: row.getCells()[3].value.toString(),
+          child: Text(
+            row.getCells()[3].value.toString(),
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: tamano),
+          ),
         ),
       ),
       Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         alignment: Alignment.center,
-        child: Text(
-          row.getCells()[4].value.toString(),
-          overflow: TextOverflow.ellipsis,
+        child: Tooltip(
+          message: row.getCells()[4].value.toString(),
+          child: Text(
+            row.getCells()[4].value.toString(),
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: tamano),
+          ),
         ),
       ),
     ]);

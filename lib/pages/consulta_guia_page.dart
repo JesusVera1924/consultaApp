@@ -1,3 +1,4 @@
+import 'package:app_consulta/class/guia.dart';
 import 'package:app_consulta/datatable/guia_datasource.dart';
 import 'package:app_consulta/dialog/dialog_detalle.dart';
 import 'package:app_consulta/provider/guia_provider.dart';
@@ -44,7 +45,10 @@ class _BodyConsultaState extends State<BodyConsulta> {
   @override
   Widget build(BuildContext context) {
     const colorW = Colors.white;
+    final _api = SolicitudApi();
     final provider = Provider.of<GuiaProvider>(context);
+
+    double tamanoFonts = MediaQuery.of(context).size.width < 400 ? 11 : 14;
 
     void selectDate(String cadena) async {
       final DateTime? picked = await showDatePicker(
@@ -74,8 +78,9 @@ class _BodyConsultaState extends State<BodyConsulta> {
     Widget _buildEndSwipeWidget(
         BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
-        onTap: () {
-          dialogProperty(context, provider.listGuias[rowIndex], "0");
+        onTap: () async {
+          await dialogProperty(
+              context, provider.listGuias[rowIndex], "0", provider);
         },
         child: Container(
           color: const Color.fromARGB(255, 51, 177, 209),
@@ -99,12 +104,16 @@ class _BodyConsultaState extends State<BodyConsulta> {
       );
     }
 
-    /// Callback for left swiping, and it will flipped for RTL case
     Widget _buildStartSwipeWidget(
         BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
-        onTap: () {
-          dialogProperty(context, provider.listGuias[rowIndex], "1");
+        onTap: () async {
+          UtilView.buildShowDialog(context);
+          await provider.findQueryKamrov(provider.listGuias[rowIndex].codEmp,
+              provider.listGuias[rowIndex].numGdr);
+          await dialogProperty(
+              context, provider.listGuias[rowIndex], "1", provider);
+          Navigator.pop(context);
         },
         child: Container(
           color: Colors.blueAccent,
@@ -141,15 +150,18 @@ class _BodyConsultaState extends State<BodyConsulta> {
                   children: [
                     const Icon(Icons.person),
                     Text(provider.nomAux),
-                    const Spacer(),
-                    Text("#${provider.listGuias.length}")
+                    /* const Spacer(),
+                    Text("#$contadorGuias") */
                   ],
                 ),
                 const Divider(thickness: 1),
                 Row(
                   children: [
                     const Icon(Icons.corporate_fare_outlined),
-                    Text(provider.nomRef)
+                    Text(
+                      provider.nomRef,
+                      style: TextStyle(fontSize: tamanoFonts),
+                    )
                   ],
                 ),
                 const Divider(thickness: 1),
@@ -163,6 +175,7 @@ class _BodyConsultaState extends State<BodyConsulta> {
                       provider.dirRef,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: tamanoFonts),
                     )),
                     const VerticalDivider(thickness: 1, color: Colors.grey),
                     const Icon(Icons.phone_android_outlined),
@@ -171,6 +184,7 @@ class _BodyConsultaState extends State<BodyConsulta> {
                       provider.telRef,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: tamanoFonts),
                     ))
                   ],
                 ),
@@ -178,19 +192,6 @@ class _BodyConsultaState extends State<BodyConsulta> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    /* Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: provider.txtUsuario,
-                      decoration: CustomInputs.boxInputDecorationGrey(
-                          hint: 'USUARIO',
-                          label: 'USUARIO',
-                          icon: Icons.person),
-                    ),
-                  ),
-                ), */
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
@@ -215,7 +216,7 @@ class _BodyConsultaState extends State<BodyConsulta> {
                         ),
                       ),
                     ),
-                    Container(
+                    /* Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -232,7 +233,7 @@ class _BodyConsultaState extends State<BodyConsulta> {
                         splashColor: Colors.grey[350],
                         onPressed: () => provider.getGuias(),
                       ),
-                    ),
+                    ), */
                   ],
                 ),
               ],
@@ -240,158 +241,108 @@ class _BodyConsultaState extends State<BodyConsulta> {
           ),
           elevation: 8,
         ),
-        /*    Padding(
-          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-          child: Card(
-            elevation: 5,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                /* Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: provider.txtUsuario,
-                      decoration: CustomInputs.boxInputDecorationGrey(
-                          hint: 'USUARIO',
-                          label: 'USUARIO',
-                          icon: Icons.person),
-                    ),
-                  ),
-                ), */
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: TextFormField(
-                      controller: provider.txtFechaInicio,
-                      decoration: CustomInputs.boxInputDecorationDatePicker(
-                          labelText: 'Inicio', fc: () => selectDate('init')),
-                      inputFormatters: [DateFormatter()],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: provider.txtFechaFin,
-                      decoration: CustomInputs.boxInputDecorationDatePicker(
-                          labelText: 'Fin', fc: () => selectDate('finish')),
-                      inputFormatters: [DateFormatter()],
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 2.5,
-                    ),
-                  ),
-                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: IconButton(
-                    icon: const Icon(Icons.search),
-                    tooltip: "Busqueda Registros",
-                    highlightColor: const Color.fromARGB(255, 84, 230, 222),
-                    splashColor: Colors.grey[350],
-                    onPressed: () => provider.getGuias(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
- */
-        /*    provider.cliente == null
-            ? const Text('')
-            : Padding(
-                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text(
-                              "Nombre: ",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              provider.cliente!.nomRef,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text(
-                              "Telefono: ",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              provider.cliente!.telRef,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                        ],
+        FutureBuilder<List<Guia>>(
+          future: _api.findGuias(UtilView.userSeleccionado,
+              provider.txtFechaInicio.text, provider.txtFechaFin.text),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isNotEmpty) {
+                provider.listGuias = snapshot.data!;
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height * 50 / 100,
+                  child: SfDataGridTheme(
+                      data: SfDataGridThemeData(
+                        headerColor:
+                            UtilView.convertColor(UtilView.empresa.cl2Emp),
+                        headerHoverColor: Colors.transparent,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text(
-                              "Direccion: ",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                      child: SfDataGrid(
+                        selectionMode: SelectionMode.single,
+                        gridLinesVisibility: GridLinesVisibility.both,
+                        headerGridLinesVisibility: GridLinesVisibility.both,
+                        columnWidthMode: ColumnWidthMode.fill,
+                        allowSwiping: true,
+                        swipeMaxOffset: 121.0,
+                        startSwipeActionsBuilder: _buildStartSwipeWidget,
+                        endSwipeActionsBuilder: _buildEndSwipeWidget,
+                        source: GuiaDataSource(
+                            provider.listGuias, context, tamanoFonts),
+                        columns: <GridColumn>[
+                          GridColumn(
+                            columnName: 'fecha',
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'F.GUIA',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: colorW, fontSize: tamanoFonts),
+                              ),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              provider.cliente!.dirRef,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
+                          GridColumn(
+                            columnName: 'numero',
+                            label: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'N°GUIA.',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: colorW, fontSize: tamanoFonts),
+                              ),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text(
-                              "Vendedor: ",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                          GridColumn(
+                            columnName: 'transporte',
+                            label: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'TRANSPORTE',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: colorW, fontSize: tamanoFonts),
+                                )),
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              provider.cliente!.nomAux,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
-                            ),
+                          GridColumn(
+                            columnName: 'guia',
+                            label: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'GUIA.',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: colorW, fontSize: tamanoFonts),
+                                )),
                           ),
+                          GridColumn(
+                              columnName: 'fechaTransporte',
+                              label: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'F.TRANSPORTE',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: colorW, fontSize: tamanoFonts),
+                                  ))),
                         ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-      */
+                      )),
+                );
+              } else {
+                return const Text('No hay guias disponibles');
+              }
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error ${snapshot.error}"));
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        )
 
-        Expanded(
+        /* Expanded(
           child: provider.listGuias.isEmpty
               ? Column(
                   children: const [
@@ -479,6 +430,7 @@ class _BodyConsultaState extends State<BodyConsulta> {
                     ],
                   )),
         )
+      */
       ],
     );
   }

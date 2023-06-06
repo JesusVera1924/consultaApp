@@ -63,24 +63,7 @@ class CustomInputs {
     );
   }
 
-  static InputDecoration boxInputDecorationDatePicker(
-      {required String labelText, required Function fc}) {
-    return InputDecoration(
-        border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
-        enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
-        labelText: labelText,
-        isDense: true,
-        contentPadding:
-            const EdgeInsets.all(10.0),
-        suffixIcon: InkWell(
-          onTap: () => fc(),
-          child: const Icon(Icons.calendar_today),
-        ));
-  }
-
-  static InputDecoration boxInputDecorationicon({
+  static InputDecoration boxInputDecorationSimple({
     required String hint,
     required String label,
   }) {
@@ -92,26 +75,70 @@ class CustomInputs {
       hintText: hint,
       labelText: label,
       isDense: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 7),
-      labelStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 10),
+      labelStyle: const TextStyle(color: Colors.grey),
+      hintStyle: const TextStyle(color: Colors.grey),
     );
   }
 
-  static InputDecoration boxInputDecorationSimple(
+  static InputDecoration boxInputDecorationFunctionClear(
       {required String hintText, required Function fc}) {
     return InputDecoration(
         border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+            borderSide: BorderSide(
+                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3))),
         enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+            borderSide: BorderSide(
+                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3))),
         hintText: hintText,
         isDense: true,
+        filled: true,
+        fillColor: const Color.fromARGB(255, 233, 229, 229),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 13, horizontal: 10),
         suffixIcon: InkWell(
           onTap: () => fc(),
           child: const Icon(Icons.clear),
+        ));
+  }
+
+  static InputDecoration boxInputDecorationIconAdd(
+      {required String labelText,
+      String? mensaje = 'Mensaje',
+      required Function fc}) {
+    return InputDecoration(
+        border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+        labelText: labelText,
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 13, horizontal: 10),
+        suffixIcon: InkWell(
+          onTap: () => fc(),
+          child: Tooltip(
+              message: mensaje,
+              child: const Icon(
+                Icons.add_outlined,
+              )),
+        ));
+  }
+
+  static InputDecoration boxInputDecorationDatePicker(
+      {required String labelText, required Function fc}) {
+    return InputDecoration(
+        border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
+        labelText: labelText,
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 13, horizontal: 10),
+        suffixIcon: InkWell(
+          onTap: () => fc(),
+          child: const Icon(Icons.calendar_today),
         ));
   }
 
@@ -138,19 +165,15 @@ class CustomInputs {
     required String label,
   }) {
     return InputDecoration(
-      fillColor: Colors.white,
-      filled: true,
-      
       border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
       enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey.withOpacity(0.3))),
-          
       hintText: hint,
       labelText: label,
       isDense: true,
       contentPadding: const EdgeInsets.all(12.0),
-      labelStyle: const TextStyle(color: Color.fromARGB(255, 19, 18, 18)),
+      labelStyle: const TextStyle(color: Colors.grey),
       hintStyle: const TextStyle(color: Colors.grey),
     );
   }

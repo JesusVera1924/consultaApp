@@ -1,3 +1,4 @@
+import 'package:app_consulta/provider/cuenta_cxc_provider.dart';
 import 'package:app_consulta/provider/cuenta_provider.dart';
 import 'package:app_consulta/provider/guia_provider.dart';
 import 'package:app_consulta/routes/routes.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const AppState()); 
+  runApp(const AppState());
 }
 
 class AppState extends StatelessWidget {
@@ -15,12 +16,13 @@ class AppState extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CuentaProvider()), 
-        ChangeNotifierProvider(create: (_) => GuiaProvider()), 
+        ChangeNotifierProvider(create: (_) => CuentaProvider()),
+        ChangeNotifierProvider(create: (_) => GuiaProvider()),
+        ChangeNotifierProvider(create: (_) => CuentaCxcProvider()),
       ],
-      child: const MyApp(),
+      child: const MyApp(), 
     );
-  } 
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
           appBarTheme:
               const AppBarTheme(iconTheme: IconThemeData(color: Colors.white)),
           colorScheme: ColorScheme.fromSwatch()
-              .copyWith(secondary: const Color.fromRGBO(255, 148, 0, 1.8))),
+              .copyWith(secondary: const Color.fromARGB(202, 29, 46, 82))),
     );
   }
 }

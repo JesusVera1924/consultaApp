@@ -2,45 +2,28 @@ import 'package:app_consulta/widget/util_view.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Titulo de menu'),
-        backgroundColor: UtilView.convertColor(UtilView.empresa.cl2Emp),
-      ),
-      drawer: const MenuLateral(),
-      body: const Center(
-        child: Text('Inicio'),
-      ),
-    );
-  }
+  State<MenuPage> createState() => _MenuPageState();
 }
 
-class MenuLateral extends StatefulWidget {
-  const MenuLateral({Key? key}) : super(key: key);
-
-  @override
-  _MenuLateralState createState() => _MenuLateralState();
-}
-
-class _MenuLateralState extends State<MenuLateral> {
-  String finalValor = "";
-  String preYkk = "";
-  String finalValorEmp = "";
+class _MenuPageState extends State<MenuPage> {
+  String? usuario = "";
+  String? correo = "";
+  String? empresa = "";
 
   Future getValues() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var usuario = preferences.getString('name');
-    var email = preferences.getString('ykkk');
-    finalValorEmp = preferences.getString('codEmp')!;
+    var xusuario = preferences.getString('name');
+    var xcorreo = preferences.getString('ykkk');
+    var xempresa = preferences.getString('codEmp')!;
 
     setState(() {
-      finalValor = usuario!;
-      preYkk = email!;
+      usuario = xusuario;
+      correo = xcorreo;
+      empresa = xempresa;
     });
   }
 
@@ -50,6 +33,54 @@ class _MenuLateralState extends State<MenuLateral> {
     super.initState();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    DateTime anio = DateTime.now();
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Menu'.toUpperCase()),
+          backgroundColor: UtilView.convertColor(UtilView.empresa.cl2Emp),
+        ),
+        drawer: MenuLateral(email: usuario!, user: correo!, empresa: empresa!),
+        body: Column(
+          children: [
+            const Spacer(),
+            Center(
+              child: Image(
+                width: 250.0,
+                height: 250.0,
+                image: AssetImage(empresa == "01"
+                    ? 'lib/image/cojapanwp.png'
+                    : 'lib/image/logo.jpg'),
+              ),
+            ),
+            const Spacer(),
+            Text(
+              'Powered by Tecosistemas  Copyrigh (c) ${anio.year}',
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
+            )
+          ],
+        ));
+  }
+}
+
+class MenuLateral extends StatefulWidget {
+  final String email;
+  final String user;
+  final String empresa;
+
+  const MenuLateral(
+      {Key? key,
+      required this.email,
+      required this.user,
+      required this.empresa})
+      : super(key: key);
+
+  @override
+  _MenuLateralState createState() => _MenuLateralState();
+}
+
+class _MenuLateralState extends State<MenuLateral> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -74,7 +105,7 @@ class _MenuLateralState extends State<MenuLateral> {
                         SizedBox(
                           width: 140,
                           height: 80,
-                          child: finalValorEmp == "01"
+                          child: widget.empresa == "01"
                               ? Image.asset(
                                   "lib/image/cojapanwp.png",
                                   fit: BoxFit.fill,
@@ -85,7 +116,7 @@ class _MenuLateralState extends State<MenuLateral> {
                                 ),
                         ),
                         Text(
-                          finalValor + "\n" + preYkk,
+                          widget.email + "\n" + widget.user,
                           style: const TextStyle(color: Colors.white),
                         )
                       ],
@@ -95,7 +126,7 @@ class _MenuLateralState extends State<MenuLateral> {
             leading: const Icon(Icons.assignment),
             title: const Text("Estado de cuenta"),
             onTap: () {
-              Navigator.pushNamed(context, 'consulta');
+              Navigator.pushNamed(context, 'consultausercxc');
             },
           ),
           ListTile(
@@ -114,6 +145,8 @@ class _MenuLateralState extends State<MenuLateral> {
             onTap: () async {
               final prefs = await SharedPreferences.getInstance();
               prefs.remove('name');
+              prefs.remove('ykkk');
+              prefs.remove('codEmp');
               Navigator.pushNamed(context, 'login');
             },
           ),

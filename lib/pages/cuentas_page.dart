@@ -1,7 +1,6 @@
 import 'package:app_consulta/class/cc0020.dart';
 import 'package:app_consulta/datatable/ctadatasource.dart';
 import 'package:app_consulta/provider/cuenta_provider.dart';
-import 'package:app_consulta/services/solicitud_api.dart';
 import 'package:app_consulta/style/custom_inputs.dart';
 import 'package:app_consulta/widget/util_view.dart';
 import 'package:flutter/material.dart';
@@ -160,12 +159,13 @@ class _BodyCuentaState extends State<BodyCuenta> {
                     const Icon(Icons.person),
                     Text(provider.nomAux),
                     const Spacer(),
+                    
                     SizedBox(
                       width: 150,
                       child: TextFormField(
                         keyboardType: TextInputType.text,
                         controller: editingController,
-                        decoration: CustomInputs.boxInputDecorationicon(
+                        decoration: CustomInputs.boxInputDecorationSimple(
                             hint: 'Busqueda', label: 'Busqueda'),
                         onEditingComplete: () {
                           setState(() {

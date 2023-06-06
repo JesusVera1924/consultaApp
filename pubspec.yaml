@@ -32,18 +32,29 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  flutter_app_name: ^0.1.1
+  flutter_launcher_icons: ^0.10.0
+  flutter_native_splash: ^2.1.2+1
   flutter_svg: ^1.0.3
   http: ^0.13.4
   intl: ^0.17.0
   provider: ^6.0.2
   shared_preferences: ^2.0.13
-  syncfusion_flutter_core: ^19.4.50
-  syncfusion_flutter_datagrid: ^19.4.50
+  syncfusion_flutter_core: ^20.1.59
+  syncfusion_flutter_datagrid: ^20.1.59
 
 dev_dependencies:
   flutter_lints: ^1.0.0
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/iconlogo.png"
+
+flutter_app_name:
+  name: "Appflutter pub run flutter_app_nameGuias"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -57,6 +68,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/image/
+    - assets/
     - lib/image/fondoLogo.jpg
     - lib/image/imgNav.jpg
     - lib/image/block.png

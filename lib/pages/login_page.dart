@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:app_consulta/class/users.dart';
 import 'package:app_consulta/dialog/dialog_aceptar.dart';
 import 'package:app_consulta/services/conexion.dart';
@@ -6,6 +5,7 @@ import 'package:app_consulta/services/solicitud_api.dart';
 import 'package:app_consulta/widget/util_view.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
@@ -73,7 +73,34 @@ class _BodyLogeoState extends State<BodyLogeo> {
                           width: double.infinity,
                           height: 360.0,
                           fit: BoxFit.cover,
-                          image: AssetImage('lib/image/fondoLogo.jpg'),
+                          image: AssetImage('assets/fondo.jpg'),
+                        ),
+                        const Center(
+                          child: Image(
+                            width: 300.0,
+                            height: 300.0,
+                            fit: BoxFit.cover,
+                            image: AssetImage('assets/logo.png'),
+                          ),
+                        ),
+                        Positioned(
+                          top: 310,
+                          left: 63,
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Powered by Tecosistemas  Copyrigh (c) 2022',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 255, 254, 254),
+                                      fontSize: 15),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 50.0),
@@ -101,7 +128,7 @@ class _BodyLogeoState extends State<BodyLogeo> {
                                       fontSize: 30.0),
                                 ),
                                 const Text(
-                                  'Bienvenido a la App',
+                                  '--------------------',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15.0),
@@ -111,7 +138,8 @@ class _BodyLogeoState extends State<BodyLogeo> {
                                 const SizedBox(height: 20),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                      primary: Colors.amber,
+                                      primary:
+                                          const Color.fromARGB(255, 14, 36, 77),
                                       shape: const StadiumBorder()),
                                   onPressed: () async {
                                     setState(() {
@@ -240,6 +268,9 @@ Widget _emailInput(control) {
       textCapitalization: TextCapitalization.characters,
       controller: control,
       keyboardType: TextInputType.text,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(4),
+      ],
       decoration: const InputDecoration(
           hintText: 'Usuario',
           border: OutlineInputBorder(borderSide: BorderSide.none)),
@@ -258,6 +289,9 @@ Widget _passwordInput(control) {
       controller: control,
       keyboardType: TextInputType.number,
       obscureText: true,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(4),
+      ],
       decoration: const InputDecoration(
           hintText: 'Password',
           border: OutlineInputBorder(borderSide: BorderSide.none)),

@@ -17,8 +17,8 @@ class Cliente {
     this.codZon = "",
     this.codRut = "",
     this.dirRef = "",
-    this.dirRfx = "",
-    this.dirRfy = "",
+    this.dirRxf = "",
+    this.dirRyf = "",
     this.telRef = "",
     this.imgJpg = "",
     this.codAux = "",
@@ -132,8 +132,8 @@ class Cliente {
   String codZon;
   String codRut;
   String dirRef;
-  String dirRfx;
-  String dirRfy;
+  String dirRxf;
+  String dirRyf;
   String telRef;
   String imgJpg;
   String codAux;
@@ -252,8 +252,8 @@ class Cliente {
         codZon: json["cod_zon"],
         codRut: json["cod_rut"],
         dirRef: json["dir_ref"],
-        dirRfx: json["dir_rfx"],
-        dirRfy: json["dir_rfy"],
+        dirRxf: json["dir_rxf"],
+        dirRyf: json["dir_ryf"],
         telRef: json["tel_ref"],
         imgJpg: json["img_jpg"],
         codAux: json["cod_aux"],
@@ -368,8 +368,8 @@ class Cliente {
         "cod_zon": codZon,
         "cod_rut": codRut,
         "dir_ref": dirRef,
-        "dir_rfx": dirRfx,
-        "dir_rfy": dirRfy,
+        "dir_rxf": dirRxf,
+        "dir_ryf": dirRyf,
         "tel_ref": telRef,
         "img_jpg": imgJpg,
         "cod_aux": codAux,
