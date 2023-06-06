@@ -46,6 +46,15 @@ class UtilView {
     return colorPrimario;
   }
 
+  static int convertColorInt(String color) {
+    int colorPrimario = 0;
+    if (color != "") {
+      final colorF = color.replaceAll("#", "0xFF");
+      return colorPrimario = int.parse(colorF.toUpperCase());
+    }
+    return colorPrimario;
+  }
+
   static String dateFormatDMY(String cadena) {
     DateTime date = DateTime.parse(cadena);
     return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
