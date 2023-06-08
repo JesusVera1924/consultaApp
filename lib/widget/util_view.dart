@@ -76,6 +76,16 @@ class UtilView {
     return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
   }
 
+  static String getStringFormat(String numero, int log) {
+    int fix = numero.length; //tamaño del numero
+    String resp = ""; // nuevo String a devolver
+    String nuevo = "${int.parse(numero)}";
+    if (fix <= log) {
+      resp = nuevo.padLeft(log, '0');
+    }
+    return resp;
+  }
+
   static buildShowDialog(BuildContext context) {
     return showDialog(
         context: context,

@@ -304,6 +304,29 @@ class SolicitudApi {
     }
   }
 
+  Future<Guia?> queryGuia(String numero) async {
+    dynamic resul;
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getNumeroGuia',
+        {'numero': numero});
+
+    print(url.toString());
+
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        if (respuesta.body != "") {
+          resul = Guia.fromJson(utf8.decode(respuesta.bodyBytes));
+        }
+
+        return resul;
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+  }
+
   Future<List<ClienteVen>> findClientVen(String empresa, String ven) async {
     List<ClienteVen> resul = [];
     var url = Uri.https('www.cojapan.com.ec', '/contabilidad/vldClientes',
@@ -455,6 +478,48 @@ class SolicitudApi {
       if (respuesta.statusCode == 200) {
         if (respuesta.body != "") {
           resul = Ig0040Y.fromJson(utf8.decode(respuesta.bodyBytes));
+        }
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+    return resul;
+  }
+
+  Future<String> getNumeroFecha(String numero) async {
+    String resul = "";
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getFechaMenbrete',
+        {'numero': numero});
+
+    print(url.toString());
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        if (respuesta.body != "") {
+          resul = utf8.decode(respuesta.bodyBytes);
+        }
+      } else {
+        throw Exception('Excepcion ' + respuesta.statusCode.toString());
+      }
+    } catch (e) {
+      throw ('error el en GET: $e');
+    }
+    return resul;
+  }
+
+  Future<String> getNombreusuario(String codigo) async {
+    String resul = "";
+    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getNombreMg0032',
+        {'empresa': '01', 'cliente': codigo});
+
+    print(url.toString());
+    try {
+      http.Response respuesta = await http.get(url);
+      if (respuesta.statusCode == 200) {
+        if (respuesta.body != "") {
+          resul = utf8.decode(respuesta.bodyBytes);
         }
       } else {
         throw Exception('Excepcion ' + respuesta.statusCode.toString());

@@ -1,4 +1,5 @@
 import 'package:app_consulta/pages/consulta_cxc_page.dart';
+import 'package:app_consulta/pages/consulta_factura.dart';
 import 'package:app_consulta/pages/consulta_guia_page.dart';
 import 'package:app_consulta/pages/consulta_page.dart';
 import 'package:app_consulta/pages/consulta_user_page.dart';
@@ -17,4 +18,5 @@ final routes = <String, WidgetBuilder>{
   'consultaGuia': (BuildContext context) => const ConsultaGuiaPage(),
   'guia': (BuildContext context) => const GuiaPage(),
   'consultausercxc': (BuildContext context) => const ConsultaCxcPage(),
+  'consultafactura': (BuildContext context) => const ConsultaFactura(),
 };

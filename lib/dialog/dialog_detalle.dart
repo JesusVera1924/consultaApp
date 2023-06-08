@@ -110,6 +110,21 @@ Future<bool> dialogProperty(BuildContext context, Guia guia, String estado,
                         ))
                       ],
                     ),
+                    const Divider(thickness: 1),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Expanded(child: Text('F.MENBRETE:')),
+                        Expanded(
+                            child: Text(
+                          provider.menbrete.split("&")[0].trim(),
+                          textAlign: TextAlign.end,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ))
+                      ],
+                    ),
                   ],
                 )
               : Column(

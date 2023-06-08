@@ -1,5 +1,6 @@
 import 'package:app_consulta/class/cliente.dart';
 import 'package:app_consulta/class/guia.dart';
+import 'package:app_consulta/class/ig0040y.dart';
 import 'package:app_consulta/class/karmov.dart';
 import 'package:app_consulta/class/usuario_response.dart';
 import 'package:app_consulta/services/solicitud_api.dart';
@@ -9,13 +10,19 @@ import 'package:flutter/material.dart';
 class GuiaProvider extends ChangeNotifier {
   List<Guia> listGuias = [];
   Cliente? cliente;
-  late Karmov isSelectKarmov;
+  Karmov? isSelectKarmov;
+
+  Guia? isSelectGuia;
+  List<Karmov> listKarmov = [];
   List<UsuarioResponse> listUsuario = [];
   List<UsuarioResponse> listUsuarioTemp = [];
+  String supervisor = "";
+  String empacador = "";
   final solicitudApi = SolicitudApi();
   bool isShow = true;
   String numero = "";
-
+  String menbrete = "";
+  Ig0040Y? factura;
   TextEditingController controllerC = TextEditingController();
   TextEditingController txtfindVendedor = TextEditingController();
 
@@ -64,14 +71,49 @@ class GuiaProvider extends ChangeNotifier {
   }
 
   Future findQueryKamrov(String emp, String nummov) async {
-    var list = await solicitudApi.getKarmov(emp, nummov);
-    var factura = await solicitudApi.getFacturaIg0040y(nummov);
+    try {
+      var list = await solicitudApi.getKarmov(emp, nummov);
+      var factura = await solicitudApi.getFacturaIg0040y(nummov);
+      menbrete = await solicitudApi.getNumeroFecha(nummov);
 
-    if (list.isNotEmpty) {
-      isSelectKarmov = list[0];
+      if (list.isNotEmpty) {
+        isSelectKarmov = list[0];
+      }
+      if (factura != null) {
+        numero = factura.usrIbs;
+      }
+    } catch (e) {
+      print(e);
     }
-    if (factura != null) {
-      numero = factura.usrIbs;
+  }
+
+  Future findQueryFactura(String numero) async {
+    try {
+      var list = await solicitudApi.getKarmov("01", numero);
+
+      if (list.isNotEmpty) {
+        isSelectKarmov = list[0];
+        listKarmov = list;
+        factura = await solicitudApi.getFacturaIg0040y(isSelectKarmov!.numMov);
+        if (factura != null) {
+          menbrete = await solicitudApi.getNumeroFecha(factura!.numMov);
+          isSelectGuia = await solicitudApi.queryGuia(isSelectKarmov!.numMov);
+          /*  if (menbrete.split("&")[1] != "") {
+            empacador =
+                await solicitudApi.getNombreusuario(menbrete.split("&")[1]);
+          } */
+          if (menbrete.split("&")[2] != "") {
+            supervisor = await solicitudApi.getNombreusuario(
+                menbrete.split("&")[2].trim().replaceAll("+", ""));
+            if (supervisor == "") {
+              supervisor =
+                  menbrete.split("&")[2].trim().replaceAll("+", "") + " - N/A";
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print(e);
     }
   }
 

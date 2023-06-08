@@ -122,7 +122,7 @@ class _MenuLateralState extends State<MenuLateral> {
                       ],
                     )),
               ])),
-          ListTile(
+          /*   ListTile(
             leading: const Icon(Icons.assignment),
             title: const Text("Estado de cuenta"),
             onTap: () {
@@ -138,6 +138,11 @@ class _MenuLateralState extends State<MenuLateral> {
             leading: const Icon(Icons.search),
             title: const Text('Consulta de guias'),
             onTap: () => Navigator.pushNamed(context, 'guia'),
+          ), */
+          ListTile(
+            leading: const Icon(Icons.search),
+            title: const Text('Consulta de factura'),
+            onTap: () => Navigator.pushNamed(context, 'consultafactura'),
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_outlined),
