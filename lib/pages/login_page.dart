@@ -83,14 +83,14 @@ class _BodyLogeoState extends State<BodyLogeo> {
                             image: AssetImage('assets/logo.png'),
                           ),
                         ),
-                        Positioned(
+                        const Positioned(
                           top: 310,
                           left: 63,
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              children: const [
+                              children: [
                                 Text(
                                   'Powered by Tecosistemas  Copyrigh (c) 2022',
                                   textAlign: TextAlign.center,

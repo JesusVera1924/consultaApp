@@ -20,7 +20,7 @@ class SolicitudApi {
   Future<Empresa> getSettingEmp(String emp) async {
     Empresa dato;
     var url = Uri.parse(
-        "https://www.cojapan.com.ec/solicitud/getempresa?empresa=$emp");
+        "http://181.39.96.138:8081/desarrollosolicitud/getempresa?empresa=$emp");
     print(url.toString());
 
     try {
@@ -42,7 +42,7 @@ class SolicitudApi {
   }
 
   Future<List<User>> getLogin(String user, String pass) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/loginMovil',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/loginMovil',
         {'usuario': user, 'pass': pass});
 
     print(url.toString());
@@ -64,7 +64,7 @@ class SolicitudApi {
   }
 
   Future<List<Cobranza>> consultaClientes(String emp) async {
-    var url = Uri.http('www.cojapan.com.ec:8088',
+    var url = Uri.http('181.39.96.138:8081',
         '/wscojapan/rest/service_cobranza/clientescob', {'codemp': emp});
 
     print(url.toString());
@@ -82,7 +82,7 @@ class SolicitudApi {
 
   Future<List<CuentaUsuario>> consultaClientescxc(
       String empresa, vendedor) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getusercxc',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getusercxc',
         {'empresa': empresa, 'vendedor': vendedor});
 
     print(url.toString());
@@ -113,7 +113,7 @@ class SolicitudApi {
 /*   Future<List<FacturaCabecera>> consultaFacturaCab(
       String emp, String tipo, String nummov, String codref) async {
     var url = Uri.http(
-        'www.cojapan.com.ec:8088',
+        '181.39.96.138:8081:8088',
         '/wscojapan/rest/service_cobranza/cobroscab',
         {'codemp': emp, 'codref': codref, 'codmov': tipo, 'nummov': nummov});
     print(url.toString());
@@ -138,7 +138,7 @@ class SolicitudApi {
 
   Future<List<FacturaDet>> consultaFacturaDet(
       String emp, String tipo, String nummov, String codref) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobrosdeb',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/cobrosdeb',
         {'codemp': emp, 'codref': codref, 'codmov': tipo, 'nummov': nummov});
 
     print(url.toString());
@@ -161,7 +161,7 @@ class SolicitudApi {
 
   Future<List<FacturaCabecera>> consultaFacturaCabFech(String emp, String tipo,
       String codref, String fecdes, String fechas) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobroscab', {
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/cobroscab', {
       'codemp': emp,
       'codref': codref,
       'codmov': tipo,
@@ -185,7 +185,7 @@ class SolicitudApi {
 
   Future<List<FacturaCabecera>> consultaFacturaCabSolo(
       String emp, String codref, String fecdes, String fechas) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/cobroscab', {
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/cobroscab', {
       'codemp': emp,
       'codref': codref,
       'codmov': '',
@@ -210,7 +210,7 @@ class SolicitudApi {
   Future<List<CuentasPorCobrar>> consultaCuentasxCobrar(
       String emp, String codref) async {
     var url = Uri.http(
-        'www.cojapan.com.ec:8088',
+        '181.39.96.138:8081:8088',
         '/wscojapan/rest/service_cobranza/ctaxcob',
         {'codemp': emp, 'codref': codref});
 
@@ -237,7 +237,7 @@ class SolicitudApi {
 
   Future<List<Cc0020>> consultaSolicitudCuenta(
       String emp, String codmov, String codref) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getCc0020',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getCc0020',
         {'emp': emp, 'codmov': codmov, 'codref': codref});
 
     print(url.toString());
@@ -260,7 +260,7 @@ class SolicitudApi {
   }
 
   Future<List<UsrEmp>> consultaUserEmp(String grupo, String codusr) async {
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getEmpUser',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getEmpUser',
         {'grupo': grupo, 'codusr': codusr});
     print(url.toString());
 
@@ -283,7 +283,7 @@ class SolicitudApi {
 
   Future<Cliente?> queryCliente(String empresa, String usuario) async {
     dynamic resul;
-    var url = Uri.https('www.cojapan.com.ec', '/solicitud/getcliente',
+    var url = Uri.http('181.39.96.138:8081', '/desarrollosolicitud/getcliente',
         {'empresa': empresa, 'codigo': usuario});
 
     print(url.toString());
@@ -306,7 +306,7 @@ class SolicitudApi {
 
   Future<Guia?> queryGuia(String numero) async {
     dynamic resul;
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getNumeroGuia',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getNumeroGuia',
         {'numero': numero});
 
     print(url.toString());
@@ -329,7 +329,7 @@ class SolicitudApi {
 
   Future<List<ClienteVen>> findClientVen(String empresa, String ven) async {
     List<ClienteVen> resul = [];
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/vldClientes',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/vldClientes',
         {'codemp': empresa, 'codven': ven});
     print(url.toString());
     try {
@@ -355,7 +355,7 @@ class SolicitudApi {
   Future<List<Guia>> findGuias(
       String usuario, String inicio, String fin) async {
     List<Guia> resul = [];
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getguias',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getguias',
         {'usuario': usuario, 'inicio': inicio, 'fin': fin});
     print(url.toString());
     try {
@@ -379,7 +379,9 @@ class SolicitudApi {
   Future<List<Cliente>> queryClienteVen(
       String empresa, String codigo, String vendcode) async {
     List<Cliente> resul = [];
-    var url = Uri.https('www.cojapan.com.ec', '/solicitud/getvenclientes',
+    var url = Uri.http(
+        '181.39.96.138:8081',
+        '/desarrollosolicitud/getvenclientes',
         {'empresa': empresa, 'codigo': codigo, 'vendedor': vendcode});
 
     print(url.toString());
@@ -408,7 +410,7 @@ class SolicitudApi {
   Future<List<UsuarioResponse>> getListClientVen(
       String empresa, String inicio, String fin, String vendcode) async {
     List<UsuarioResponse> resul = [];
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getUsuarioGuia', {
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getUsuarioGuia', {
       'empresa': empresa,
       'inicio': inicio,
       'fin': fin,
@@ -441,7 +443,7 @@ class SolicitudApi {
 
   Future<List<Karmov>> getKarmov(String empresa, String movimiento) async {
     List<Karmov> resul = [];
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getMovKarmov',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getMovKarmov',
         {'codemp': empresa, 'nummov': movimiento});
 
     print(url.toString());
@@ -469,8 +471,8 @@ class SolicitudApi {
 
   Future<Ig0040Y?> getFacturaIg0040y(String numero) async {
     Ig0040Y? resul;
-    var url = Uri.https(
-        'www.cojapan.com.ec', '/contabilidad/getFactura', {'tipo': numero});
+    var url = Uri.http(
+        '181.39.96.138:8082', '/contabilidad/getFactura', {'tipo': numero});
 
     print(url.toString());
     try {
@@ -490,7 +492,7 @@ class SolicitudApi {
 
   Future<String> getNumeroFecha(String numero) async {
     String resul = "";
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getFechaMenbrete',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getFechaMenbrete',
         {'numero': numero});
 
     print(url.toString());
@@ -511,7 +513,7 @@ class SolicitudApi {
 
   Future<String> getNombreusuario(String codigo) async {
     String resul = "";
-    var url = Uri.https('www.cojapan.com.ec', '/contabilidad/getNombreMg0032',
+    var url = Uri.http('181.39.96.138:8082', '/contabilidad/getNombreMg0032',
         {'empresa': '01', 'cliente': codigo});
 
     print(url.toString());
@@ -530,5 +532,5 @@ class SolicitudApi {
     return resul;
   }
 
-  //https://www.cojapan.com.ec/contabilidad/getUsuarioGuia?empresa=01&vendedor=V009
+  //http://181.39.96.138:8081/contabilidad/getUsuarioGuia?empresa=01&vendedor=V009
 }
